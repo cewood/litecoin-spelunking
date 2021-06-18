@@ -1,0 +1,3 @@
+# Ignore everything, we don't actually need anything locally for
+#  the docker build context
+*
