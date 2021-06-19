@@ -47,7 +47,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: litecoin
-        image: docker.io/cewood/litecoin:latest
+        image: docker.io/cewood/litecoin:e9b8cf3-dirty
         imagePullPolicy: IfNotPresent
         resources:
           limits:
