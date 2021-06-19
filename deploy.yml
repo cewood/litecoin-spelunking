@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: litecoin
+  labels:
+    app: litecoin
+spec:
+  ports:
+  - port: 9332
+    name: rpc-default
+  - port: 9333
+    name: listen-default
+  - port: 19332
+    name: rpc-testnet
+  - port: 19335
+    name: listen-testnet
+  - port: 19443
+    name: rpc-regtest
+  - port: 19444
+    name: listen-regtest
+  clusterIP: None
+  selector:
+    app: litecoin
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: litecoin
+  annotations:
+    kube-score/ignore: |
+      container-image-pull-policy,
+      container-security-context,
+      container-security-context-user-group-id,
+      pod-networkpolicy,
+      pod-probes
+spec:
+  selector:
+    matchLabels:
+      app: litecoin # has to match .spec.template.metadata.labels
+  serviceName: "litecoin"
+  replicas: 1 # default is 1
+  template:
+    metadata:
+      labels:
+        app: litecoin # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: litecoin
+        image: docker.io/cewood/litecoin:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1G"
+          requests:
+            cpu: "0.5"
+            memory: "1G"
+        ports:
+        - containerPort: 9332
+          name: rpc-default
+        - containerPort: 9333
+          name: listen-default
+        - containerPort: 19332
+          name: rpc-testnet
+        - containerPort: 19335
+          name: listen-testnet
+        - containerPort: 19443
+          name: rpc-regtest
+        - containerPort: 19444
+          name: listen-regtest
+        volumeMounts:
+        - name: litecoin
+          mountPath: /home/litecoin/.litecoin
+        securityContext:
+          runAsUser: 1111
+          runAsGroup: 1111
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+  volumeClaimTemplates:
+  - metadata:
+      name: litecoin
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "standard"
+      resources:
+        requests:
+          storage: 1Gi
