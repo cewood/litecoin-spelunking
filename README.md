@@ -27,3 +27,8 @@ Again there are various helper targets in the [Makefile](Makefile) to help with 
  - `kind-load-image`: for loading the Docker image into the local KinD cluster
  - `patch-deployment`: for updating the [deploy.yml](deploy.yml) manifest with the Docker image tag
  - `kind-deploy`: to help with deploying the [deploy.yml](deploy.yml) manifest to the KinD cluster
+
+
+## CI workflow
+
+There's a basic GitHub Actions workflow that lints the Dockerfile, builds and checks the resulting Docker image. The example Kubernets manifest is linted, a local Kubernetes cluster is created with KinD, and the Docker image is deployed to said cluster using the manifest. You can see the associated configuration at [.github/workflows/main.yml](.github/workflows/main.yml).

@@ -1,0 +1,44 @@
+name: main
+
+on:
+  push:
+    branches:
+    - "*"  # run for branches
+    tags:
+    - "*"  # run for tags
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    # Lint Dockerfile
+    - name: Lint Dockerfile
+      run: make hadolint
+
+    # Build the Docke image
+    - name: Build Docker image
+      run: make docker
+
+    # Check Docker image size
+    - name: Check Docker image size
+      run: make dive
+
+    # Check Docker image for security
+    - name: Check Docker image security
+      run: make trivy
+
+    # Lint kubernetes manifest
+    - name: Lint kubernetes manifest
+      run: make kube-score
+
+    # Set up kubernetes deps
+    - name: Set up kubernetes deps
+      run: make _ci-kind-sink
+
+    # Deploy kubernetes manifest
+    - name: Deploy kubernetes manifest
+      run: GIT_REVISION=${GITHUB_SHA::7} make kind-deploy

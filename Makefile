@@ -102,3 +102,18 @@ kubeval:
 	  -it \
 	  -v ${PWD}:/workdir garethr/kubeval:0.15.0 \
 	  /workdir/deploy.yml
+
+.PHONY: _install-kubectl
+_install-kubectl:
+	curl -LO https://dl.k8s.io/release/v1.21.1/bin/linux/amd64/kubectl \
+	  && chmod +x ./kubectl \
+	  && sudo mv ./kubectl /usr/local/bin/kubectl
+
+.PHONY: _install-kind
+_install-kind:
+	curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 \
+	  && chmod +x ./kind \
+	  && sudo mv ./kind /usr/local/bin/kind
+
+.PHONY: _ci-kind-sink
+_ci-kind-sink: _install-kubectl _install-kind kind-create
